@@ -40,7 +40,22 @@ $ python setup.py build develop --no-deps
 
 ## Training and Testing
 
+**Note:** Our method is  an object detection task. So we still adopt pretrained weights of FCOS. Please refer the official repo to download [models](https://github.com/tianzhi0549/FCOS#models)
+
 * **Yamls**
+
+We put the dataset paths and parameter configs involved in the training in the yaml file. Taking [fcos_R_50_FPN_1x_coco.yaml](./configs/danger_det/fcos_R_50_FPN_1x_coco.yaml) as an example.
+```bash
+path: root path of datasets;
+train_source_real: subpaths of real source images with labels for training. e.g., PascalVOC(2007+2012) trainval set;
+train_source_fake: subpaths of fake source images with labels for training. e.g., PascalVOC(2007+2012) Clipart-style trainval set;
+train_target_real: subpaths of real target images without labels for training. e.g., Clipart1k train set;
+train_tatget_fake: subpaths of fake target images without labels for training. e.g., Clipart1k VOC-style train set;
+test_target_real: subpaths of real target images with labels for testing. e.g., Clipart1k test set;
+nc: number of classes;
+names: class names list.
+```
+
 
 * **Training**
 
