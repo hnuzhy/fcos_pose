@@ -35,7 +35,7 @@ $ python setup.py build develop --no-deps
 * **Step 2:** After annotation (about 10K images totally), export your dataset in the `PascalVOC` format (`JPEGImages` folder contains selected frames, `Annotations` folder contains corresponding labels in XML format).
 * **Step 3:** Convert the annotations from `PascalVOC` XML style to `COCO` JSON style. We recommend you to refer the scripts in [voc2coco](https://github.com/yukkyo/voc2coco). Support that you finally get two (train and val) json annotation files `coco_dangerdet_train.json` and `coco_dangerdet_val.json`.
 * **Step 4:** Generate keypoints for all persons appearing in frames under the `JPEGImages` folder. We use the robust bottom-up method [OpenPifPaf](https://github.com/vita-epfl/openpifpaf) to detect all auxiliary skeletons. Because they are auxiliary labels, the imprecision of keypoints will not affect the normal execution of training. Support that you finally get all keypoints json files under the `Keypoints_JSON` folder.
-* **Step 5:** Update the json annotation files in **Step 3** with adding keypoints information. We provide an example script [voc2cocoWpose.py](tools/[voc2cocoWpose.py). Finally, you will get two new json annotation files `coco_dangerdet_Wpose_train.json` and `coco_dangerdet_Wpose_val.json`.
+* **Step 5:** Update the json annotation files in **Step 3** with adding keypoints information. We provide an example script [voc2cocoWpose.py](./tools/voc2cocoWpose.py). Finally, you will get two new json annotation files `coco_dangerdet_Wpose_train.json` and `coco_dangerdet_Wpose_val.json`.
 
 
 ## Training and Testing
