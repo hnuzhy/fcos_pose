@@ -1,0 +1,39 @@
+MODEL:
+  META_ARCHITECTURE: "GeneralizedRCNN"
+  WEIGHT: "catalog://ImageNetPretrained/MSRA/R-101"
+  RPN_ONLY: True
+  FCOS_ON: True
+  BACKBONE:
+    CONV_BODY: "R-101-FPN-RETINANET"
+  RESNETS:
+    BACKBONE_OUT_CHANNELS: 256
+  RETINANET:
+    USE_C5: False # FCOS uses P5 instead of C5
+  FCOS:
+    NUM_CLASSES: 4  # COCO is 80+1, DangerDet is 3+1
+DATASETS:
+  # TRAIN: ("coco_dangerdet_train", "coco_dangerdet_val")
+  TRAIN: ("coco_dangerdet_train",)
+  TEST: ("coco_dangerdet_val",)
+INPUT:
+  MIN_SIZE_RANGE_TRAIN: (640, 800)
+  MAX_SIZE_TRAIN: 1333
+  MIN_SIZE_TEST: 800
+  MAX_SIZE_TEST: 1333
+DATALOADER:
+  SIZE_DIVISIBILITY: 32
+SOLVER:
+  BASE_LR: 0.005  # 0.01
+  WEIGHT_DECAY: 0.0001
+  STEPS: (24000, 32000)  # (12000, 16000) when batchsize is 32
+  MAX_ITER: 40000  # 20000 when batchsize is 32
+  CHECKPOINT_PERIOD: 5000
+  IMS_PER_BATCH: 12  # 16
+  WARMUP_METHOD: "constant"
+TEST:
+  BBOX_AUG:
+    ENABLED: False
+    H_FLIP: True
+    SCALES: (400, 500, 600, 700, 900)
+    MAX_SIZE: 1400
+    SCALE_H_FLIP: True

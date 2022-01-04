@@ -1,0 +1,58 @@
+MODEL:
+  META_ARCHITECTURE: "GeneralizedRCNNPose"
+  # WEIGHT: "catalog://ImageNetPretrained/MSRA/R-50"
+  WEIGHT: ""
+  RPN_ONLY: True
+  FCOS_ON: True
+  POSENET_ON: True
+  BACKBONE:
+    CONV_BODY: "R-50-FPN-RETINANET"
+  RESNETS:
+    BACKBONE_OUT_CHANNELS: 256
+  RETINANET:
+    USE_C5: False # FCOS uses P5 instead of C5
+  FCOS:
+    NUM_CLASSES: 4  # COCO is 80+1, DangerDet is 3+1
+  POSENET:
+    N_STACK: 4  # the num of stacked hourglasses
+    OUTPUT_DIM: 17  #  number of keypoints / heatmaps, COCO:17 MPII:16
+    FUSE_TYPE: "LAST"  # default is "LAST", you can choose "FULL"
+DATASETS:
+  TRAIN: ("coco_dangerdet_Wpose_train",)  # all images shape imgh:imgw = 1600:2400 = 2:3
+  # TEST: ("coco_dangerdet_Wpose_val",)
+  TEST: ("coco_dangerdet_val",)
+INPUT:
+  # MIN_SIZE_TRAIN: (800,)  # input shape is 800:1200 = 2:3
+  # MAX_SIZE_TRAIN: 1333
+  # MIN_SIZE_TEST: 800
+  # MAX_SIZE_TEST: 1333
+  MIN_SIZE_TRAIN: (768,)  # 1/8 * 1/16, input shape is 768:1152 = 2:3, 768*1/8*1/16 = 6
+  MAX_SIZE_TRAIN: 1280
+  MIN_SIZE_TEST: 768
+  MAX_SIZE_TEST: 1280
+  # MIN_SIZE_TRAIN: (1024,)  # 1/8 * 1/16, input shape is 1024:1536 = 2:3, 1024*1/8*1/16 = 8
+  # MAX_SIZE_TRAIN: 1664
+  # MIN_SIZE_TEST: 1024
+  # MAX_SIZE_TEST: 1664
+DATALOADER:
+  SIZE_DIVISIBILITY: 32
+SOLVER:
+  BASE_LR: 0.005  # 0.01
+  WEIGHT_DECAY: 0.0001
+  STEPS: (12000, 18000)
+  MAX_ITER: 20000
+  CHECKPOINT_PERIOD: 3500
+  IMS_PER_BATCH: 10  # trained on 192.168.0.109 server with 2 3080Ti GPUs and 12*2GB
+  WARMUP_METHOD: "constant"
+TEST:
+  BBOX_AUG:
+    ENABLED: False
+    H_FLIP: True
+    SCALES: (400, 500, 600, 700, 900, 1000, 1100, 1200)  # w/o AUG, mAP 0.603
+    MAX_SIZE: 2000
+    SCALE_H_FLIP: True
+    # ENABLED: True
+    # H_FLIP: True
+    # SCALES: (512, 768, 1024, 1280)  # w/ AUG, mAP 0.
+    # MAX_SIZE: 2000
+    # SCALE_H_FLIP: True
