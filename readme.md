@@ -40,26 +40,59 @@ $ python setup.py build develop --no-deps
 
 ## Training and Testing
 
-**Note:** Our method is  an object detection task. So we still adopt pretrained weights of FCOS. Please refer the official repo to download [models](https://github.com/tianzhi0549/FCOS#models)
+**Note:** Our method is essentially an object detection task. So we still adopt pretrained weights of FCOS. Please refer the official repo to download corresponding [models](https://github.com/tianzhi0549/FCOS#models)
 
 * **Yamls**
 
-We put the dataset paths and parameter configs involved in the training in the yaml file. Taking [fcos_R_50_FPN_1x_coco.yaml](./configs/danger_det/fcos_R_50_FPN_1x_coco.yaml) as an example.
+We put the dataset paths and parameter configs involved in the training in the yaml file. Taking [fcos_R_50_FPN_1x_coco_pose2_full.yaml](./configs/danger_det/fcos_R_50_FPN_1x_coco_pose2_full.yaml) as an example. We only describe the parts that need to be modified.
 ```bash
-path: root path of datasets;
-train_source_real: subpaths of real source images with labels for training. e.g., PascalVOC(2007+2012) trainval set;
-train_source_fake: subpaths of fake source images with labels for training. e.g., PascalVOC(2007+2012) Clipart-style trainval set;
-train_target_real: subpaths of real target images without labels for training. e.g., Clipart1k train set;
-train_tatget_fake: subpaths of fake target images without labels for training. e.g., Clipart1k VOC-style train set;
-test_target_real: subpaths of real target images with labels for testing. e.g., Clipart1k test set;
-nc: number of classes;
-names: class names list.
+MODEL:
+  POSENET_ON: True
+  FCOS:
+    NUM_CLASSES: 4  # COCO is 80+1, DangerDet is 3+1
+  POSENET:
+    N_STACK: 2  # the num of stacked hourglasses
+    OUTPUT_DIM: 17  #  number of keypoints / heatmaps, COCO:17 MPII:16
+    FUSE_TYPE: "FULL"  # default is "LAST", you can choose "FULL"
+DATASETS:
+  TRAIN: ("coco_dangerdet_Wpose_train",)  # all images shape imgh:imgw = 1600:2400 = 2:3
+  TEST: ("coco_dangerdet_val",)  # when testing, we do not need pose labels
+INPUT:
+  MIN_SIZE_TRAIN: (768,)  # 1/8 * 1/16, input shape is 768:1152 = 2:3, 768*1/8*1/16 = 6
+  MAX_SIZE_TRAIN: 1280
+  MIN_SIZE_TEST: 768
+  MAX_SIZE_TEST: 1280
+SOLVER:  # Adjust parameters according to your actual needs
+  BASE_LR: 0.004  # 0.01
+  WEIGHT_DECAY: 0.0001
+  STEPS: (9000, 12000)
+  MAX_ITER: 15000
+  CHECKPOINT_PERIOD: 3500
+  IMS_PER_BATCH: 12  # 16
+  WARMUP_METHOD: "constant"
 ```
-
 
 * **Training**
 
+Still taking `fcos_R_50_FPN_1x_coco_pose2_full.yaml` as an example.
+
+```bash
+CUDA_VISIBLE_DEVICES=2,3 python -m torch.distributed.launch \
+  --nproc_per_node=2 --master_port=$((RANDOM + 10000)) \
+  tools/train_net.py \
+  --config-file configs/danger_det/fcos_R_50_FPN_1x_coco_pose2.yaml \
+  DATALOADER.NUM_WORKERS 2 \
+  OUTPUT_DIR training_dir/dangerdet_fcos_R_50_FPN_1x_coco_pose2
+```
+
 * **Testing**
+
+```bash
+CUDA_VISIBLE_DEVICES=1 python tools/test_net.py \
+  --config-file configs/danger_det/fcos_R_50_FPN_1x_coco_pose2.yaml \
+  MODEL.WEIGHT training_dir/dangerdet_fcos_R_50_FPN_1x_coco_pose2/model_final.pth \
+  TEST.IMS_PER_BATCH 16
+```
 
 ## References
 * [FCOS: Fully Convolutional One-Stage Object Detection](https://github.com/tianzhi0549/FCOS)
