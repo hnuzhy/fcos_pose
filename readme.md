@@ -97,3 +97,15 @@ CUDA_VISIBLE_DEVICES=1 python tools/test_net.py \
 ## References
 * [FCOS: Fully Convolutional One-Stage Object Detection](https://github.com/tianzhi0549/FCOS)
 * [Stacked Hourglass Networks in Pytorch](https://github.com/princeton-vl/pytorch_stacked_hourglass)
+
+
+## Citation
+
+```
+@article{zhou2022student,
+  title={Student Dangerous Behavior Detection in School},
+  author={Zhou, Huayi and Jiang, Fei and Lu, Hongtao},
+  journal={arXiv preprint arXiv:2202.09550},
+  year={2022}
+}
+```
